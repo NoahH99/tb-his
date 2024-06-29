@@ -1,0 +1,34 @@
+<configuration>
+
+    <!-- Console appender for logging to the console -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- File appender for logging to a file -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logs/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>15</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Define log levels for specific packages -->
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="com.noahhendrickson.api" level="DEBUG"/>
+
+    <!-- Root logger configuration -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>

@@ -1,0 +1,29 @@
+---
+services:
+  web:
+    image: nginx:1.27.0-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./50x.html:/usr/share/nginx/html/50x.html:ro
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_DATABASE_URL=postgresql://postgres:5432/example
+      - POSTGRES_DATABASE_USERNAME=example
+      - POSTGRES_DATABASE_PASSWORD=example
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16.3-alpine3.20
+    environment:
+      POSTGRES_USER: example
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: example
