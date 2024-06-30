@@ -1,5 +1,20 @@
 ---
 services:
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    environment:
+      - DISCORD_BOT_TOKEN=example
+      - POSTGRES_DATABASE_URL=postgresql://bot-db:5432/bot-db
+      - POSTGRES_DATABASE_USERNAME=example
+      - POSTGRES_DATABASE_PASSWORD=example
+      - API_ENDPOINT=http://web
+    depends_on:
+      - bot-db
+    networks:
+      - bot-network
+
   web:
     image: nginx:1.27.0-alpine
     ports:
@@ -9,21 +24,48 @@ services:
       - ./50x.html:/usr/share/nginx/html/50x.html:ro
     depends_on:
       - api
+    networks:
+      - bot-network
+      - api-network
 
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
     environment:
-      - POSTGRES_DATABASE_URL=postgresql://postgres:5432/example
+      - POSTGRES_DATABASE_URL=postgresql://api-db:5432/api-db
       - POSTGRES_DATABASE_USERNAME=example
       - POSTGRES_DATABASE_PASSWORD=example
     depends_on:
-      - postgres
+      - api-db
+    networks:
+      - api-network
 
-  postgres:
+  api-db:
     image: postgres:16.3-alpine3.20
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: example
       POSTGRES_PASSWORD: example
-      POSTGRES_DB: example
+      POSTGRES_DB: api-db
+    networks:
+      - api-network
+
+  bot-db:
+    image: postgres:16.3-alpine3.20
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: example
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: bot-db
+    networks:
+      - bot-network
+
+networks:
+  api-network:
+    driver: bridge
+
+  bot-network:
+    driver: bridge
